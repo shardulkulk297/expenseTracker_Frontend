@@ -31,21 +31,22 @@ const FinancerDashboard = () => {
       getTransactions();
 
     }
-    else{
+    else {
       console.log("No token found");
     }
   }, [])
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const getAccounts = async()=>{
+    const getAccounts = async () => {
 
       try {
-        const response = await axios.get("http://localhost:8081/api/account/getAccounts",{
-          headers: {Authorization: "Bearer " + localStorage.getItem('token')}
+        const response = await axios.get("http://localhost:8081/api/account/getAccounts", {
+          headers: { Authorization: "Bearer " + localStorage.getItem('token') }
         })
         console.log(response.data);
-        
+        setAccounts(response.data);
+
       } catch (error) {
         console.log(error);
       }
@@ -53,8 +54,8 @@ const FinancerDashboard = () => {
     }
 
     getAccounts();
-   
-  },[])
+
+  }, [])
 
 
 
@@ -76,14 +77,7 @@ const FinancerDashboard = () => {
 
   const handleAddAccount = (e) => {
     e.preventDefault()
-    const account = {
-      id: Date.now(),
-      name: (newAccount.name || 'Untitled Account').trim(),
-      type: newAccount.type || 'SAVINGS',
-      balance: Number(newAccount.openingBalance || 0),
-    }
-    setAccounts(prev => [account, ...prev])
-    setShowAddForm(false)
+
     setNewAccount({ name: '', type: 'SAVINGS', openingBalance: '' })
   }
 
@@ -91,13 +85,11 @@ const FinancerDashboard = () => {
   const totals = useMemo(() => {
     const totalBalance = accounts.reduce((s, a) => s + Number(a.balance || 0), 0)
     const totalSpent = transactions
-      .filter(t => t.type === 'EXPENSE')
-      .reduce((s, t) => s + Number(t.amount || 0), 0)
-    const totalIncome = transactions
-      .filter(t => t.type === 'INCOME')
-      .reduce((s, t) => s + Number(t.amount || 0), 0)
+      .filter(t => t.transactionType?.toUpperCase() === 'EXPENSE')
+      .reduce((s, t) => s + (isNaN(Number(t.amount)) ? 0 : Number(t.amount)), 0)
+
     const accountsCount = accounts.length
-    return { totalBalance, totalSpent, totalIncome, accountsCount }
+    return { totalBalance, totalSpent, accountsCount }
   }, [accounts, transactions])
 
   // When there's no data from APIs yet, show these HTML-only dummy values
@@ -125,7 +117,7 @@ const FinancerDashboard = () => {
 
       {/* Summary cards */}
       <div className="row g-3 mb-4">
-        <div className="col-6 col-md-3">
+        <div className="col-6 col-md-4">
           <div className="card p-3">
             <div className="small text-muted">Total Balance</div>
             <div className="h5 fw-bold">
@@ -134,7 +126,7 @@ const FinancerDashboard = () => {
           </div>
         </div>
 
-        <div className="col-6 col-md-3">
+        <div className="col-6 col-md-4">
           <div className="card p-3">
             <div className="small text-muted">Total Spent</div>
             <div className="h5 fw-bold text-danger">
@@ -143,16 +135,9 @@ const FinancerDashboard = () => {
           </div>
         </div>
 
-        <div className="col-6 col-md-3">
-          <div className="card p-3">
-            <div className="small text-muted">Total Income</div>
-            <div className="h5 fw-bold text-success">
-              ₹ {(hasData ? totals.totalIncome : fallbackTotals.totalIncome).toLocaleString()}
-            </div>
-          </div>
-        </div>
 
-        <div className="col-6 col-md-3">
+
+        <div className="col-6 col-md-4">
           <div className="card p-3">
             <div className="small text-muted">Accounts</div>
             <div className="h5 fw-bold">
@@ -226,8 +211,8 @@ const FinancerDashboard = () => {
                     {accounts.length > 0 ? (
                       accounts.map(acc => (
                         <tr key={acc.id}>
-                          <td>{acc.name}</td>
-                          <td>{acc.type}</td>
+                          <td>{acc.bankName}</td>
+                          <td>{acc.accountType}</td>
                           <td className="text-end">₹ {Number(acc.balance).toLocaleString()}</td>
                         </tr>
                       ))
@@ -278,9 +263,10 @@ const FinancerDashboard = () => {
                     {transactions.length > 0 ? (
                       transactions.map(tx => (
                         <tr key={tx.id}>
-                          <td>{tx.date}</td>
-                          <td>{tx.desc}</td>
-                          <td>{tx.type}</td>
+                          <td>{tx.transactionDate}</td>
+
+                          <td>{tx.description}</td>
+                          <td>{tx.transactionType}</td>
                           <td className={`text-end ${tx.type === 'EXPENSE' ? 'text-danger' : 'text-success'}`}>
                             {tx.type === 'EXPENSE' ? '-' : '+'} ₹ {Number(tx.amount).toLocaleString()}
                           </td>

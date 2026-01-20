@@ -30,29 +30,31 @@ const FinancerDashboard = () => {
       }
       getTransactions();
 
-      const getAccounts = async () => {
-        try {
-          const response = await axios.get("http://localhost:8081/api/account/getAccounts",
-            {
-              headers: { Authorization: "Bearer " + localStorage.getItem("token") }
-            })
-          console.log(response.data);
-          // setAccounts(response.data);
-        } catch (error) {
-          console.log(error);
-
-        }
-      }
-      getAccounts();
-
     }
     else{
       console.log("No token found");
     }
-
-
-
   }, [])
+
+  useEffect(()=>{
+
+    const getAccounts = async()=>{
+
+      try {
+        const response = await axios.get("http://localhost:8081/api/account/getAccounts",{
+          headers: {Authorization: "Bearer " + localStorage.getItem('token')}
+        })
+        console.log(response.data);
+        
+      } catch (error) {
+        console.log(error);
+      }
+
+    }
+
+    getAccounts();
+   
+  },[])
 
 
 

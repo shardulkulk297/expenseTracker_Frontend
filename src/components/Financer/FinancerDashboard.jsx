@@ -1,5 +1,6 @@
-import axios from 'axios'
+import axios, { Axios } from 'axios'
 import React, { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 
 
@@ -9,7 +10,12 @@ const FinancerDashboard = () => {
   const [transactions, setTransactions] = useState([])
 
   const [showAddForm, setShowAddForm] = useState(false)
-  const [newAccount, setNewAccount] = useState([])
+  const [bankName, setBankName] = useState("");
+  const [mainBalance, setMainBalance] = useState(0);
+  const [accountType, setAccountType] = useState("SAVINGS");
+
+  const [newAccount, setNewAccount] = useState({});
+
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -63,7 +69,7 @@ const FinancerDashboard = () => {
   const handleAddAccountToggle = () => {
     setShowAddForm(prev => !prev)
     if (!showAddForm) {
-      setNewAccount({ name: '', type: 'SAVINGS', openingBalance: '' })
+      setNewAccount({ bankName: '', accountType: 'SAVINGS', mainBalance: 0 })
     }
   }
 
@@ -75,10 +81,28 @@ const FinancerDashboard = () => {
     }))
   }
 
-  const handleAddAccount = (e) => {
+  const handleAddAccount = async(e) => {
     e.preventDefault()
+    toast.success("Adding Account");
 
-    setNewAccount({ name: '', type: 'SAVINGS', openingBalance: '' })
+    try {
+      const response = await axios.post("http://localhost:8081/api/account/add",{
+        bankName: bankName,
+        accountType: accountType,
+        mainBalance: Number(mainBalance),
+        balance: Number(mainBalance)
+      },{
+        headers: {Authorization: "Bearer " + localStorage.getItem("token")} 
+      })
+      console.log(response.data);
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
+    
+
+  
   }
 
   // Safe totals calculation from state (falls back to zero)
@@ -156,16 +180,17 @@ const FinancerDashboard = () => {
                 <label className="form-label small">Account name</label>
                 <input
                   className="form-control"
-                  name="name"
-                  value={newAccount.name}
-                  onChange={handleInput}
+                  name="bankName"
+                  value={bankName}
+                  onChange={(e)=>setBankName(e.target.value)}
                   placeholder="e.g. HDFC Savings"
+
                 />
               </div>
 
               <div className="col-md-3">
                 <label className="form-label small">Type</label>
-                <select className="form-select" name="type" value={newAccount.type} onChange={handleInput}>
+                <select className="form-select" name="accountType" value={accountType} onChange={(e)=> setAccountType(e.target.value)}>
                   <option value="SAVINGS">SAVINGS</option>
                   <option value="CURRENT">CURRENT</option>
                   <option value="CREDIT">CREDIT</option>
@@ -178,9 +203,9 @@ const FinancerDashboard = () => {
                   type="number"
                   min="0"
                   className="form-control"
-                  name="openingBalance"
-                  value={newAccount.openingBalance}
-                  onChange={handleInput}
+                  name="mainBalance"
+                  value={mainBalance}
+                  onChange={(e)=>setMainBalance(e.target.value)}
                 />
               </div>
 
@@ -264,7 +289,7 @@ const FinancerDashboard = () => {
                       transactions.map(tx => (
                         <tr key={tx.id}>
                           <td>{tx.transactionDate}</td>
-
+                        
                           <td>{tx.description}</td>
                           <td>{tx.transactionType}</td>
                           <td className={`text-end ${tx.type === 'EXPENSE' ? 'text-danger' : 'text-success'}`}>

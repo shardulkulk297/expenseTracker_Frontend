@@ -133,9 +133,10 @@ const FinancerDashboard = () => {
           <button className="btn btn-primary me-2" onClick={handleAddAccountToggle}>
             {showAddForm ? 'Close' : 'Add Account'}
           </button>
-          <Link to="/financer/transactions" className="btn btn-outline-secondary">
+          <Link to="/financer/transactions/view-transactions" className="btn btn-outline-secondary me-2">
             View Transactions
           </Link>
+          <Link to="/financer/transactions/add"  className="btn btn-primary">Add Transaction</Link>
         </div>
       </div>
 
@@ -331,7 +332,7 @@ const FinancerDashboard = () => {
               </div>
 
               <div className="text-end">
-                <Link to="/financer/transactions" className="btn btn-sm btn-outline-primary">See all</Link>
+                <Link to="/financer/transactions/view-transactions" className="btn btn-sm btn-outline-primary">See all</Link>
               </div>
             </div>
           </div>

@@ -17,7 +17,7 @@ const Layout = () => {
             <span>💸 Personal Expense Tracker</span>
           </Link>
           <div className="d-flex">
-            <Link to="/financer/profile" className="btn btn-primary me-2">
+            <Link to="/financer/your-profile" className="btn btn-primary me-2">
               Your Profile
             </Link>
           </div>

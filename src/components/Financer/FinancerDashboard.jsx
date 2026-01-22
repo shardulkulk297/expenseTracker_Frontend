@@ -83,7 +83,6 @@ const FinancerDashboard = () => {
 
   const handleAddAccount = async(e) => {
     e.preventDefault()
-    toast.success("Adding Account");
 
     try {
       const response = await axios.post("http://localhost:8081/api/account/add",{
@@ -95,7 +94,11 @@ const FinancerDashboard = () => {
         headers: {Authorization: "Bearer " + localStorage.getItem("token")} 
       })
       console.log(response.data);
+      setTimeout(()=>{
+        window.location.reload();
+      },4000)
       
+      toast.success("Added Account successfully");
     } catch (error) {
       console.log(error);
       
@@ -127,6 +130,15 @@ const FinancerDashboard = () => {
 
   return (
     <div>
+        <nav aria-label="breadcrumb" className="mb-4">
+        <ol className="breadcrumb bg-light px-3 py-2 rounded shadow-sm">
+          <li className="breadcrumb-item">
+            <a href="/" className="text-decoration-none">🔐Login</a>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            Dashboard          </li>
+        </ol>
+      </nav>
       <div className="d-flex align-items-center justify-content-between mb-4">
         <h1 className="h4 m-0">Financer Dashboard</h1>
         <div>
@@ -245,16 +257,7 @@ const FinancerDashboard = () => {
                     ) : (
                       // HTML-only dummy rows (visible while APIs not wired)
                       <>
-                        <tr>
-                          <td>HDFC Savings</td>
-                          <td>SAVINGS</td>
-                          <td className="text-end">₹ 50,000</td>
-                        </tr>
-                        <tr>
-                          <td>ICICI Current</td>
-                          <td>CURRENT</td>
-                          <td className="text-end">₹ 20,000</td>
-                        </tr>
+                        No accounts Added yet
                       </>
                     )}
 
@@ -299,32 +302,13 @@ const FinancerDashboard = () => {
                         </tr>
                       ))
                     ) : (
-                      // HTML-only dummy rows while APIs are not wired
-                      <>
-                        <tr>
-                          <td>2026-01-12</td>
-                          <td>Electricity Bill</td>
-                          <td>EXPENSE</td>
-                          <td className="text-end text-danger">- ₹ 2,500</td>
-                        </tr>
-                        <tr>
-                          <td>2026-01-10</td>
-                          <td>Grocery</td>
-                          <td>EXPENSE</td>
-                          <td className="text-end text-danger">- ₹ 1,500</td>
-                        </tr>
-                        <tr>
-                          <td>2026-01-08</td>
-                          <td>Salary</td>
-                          <td>INCOME</td>
-                          <td className="text-end text-success">+ ₹ 60,000</td>
-                        </tr>
-                      </>
+                      <></>
+                      
                     )}
 
                     {transactions.length === 0 && (
                       <tr>
-                        <td colSpan="4" className="text-center small text-muted">No transactions yet (showing sample rows)</td>
+                        <td colSpan="4" className="text-center small text-muted">No transactions yet</td>
                       </tr>
                     )}
                   </tbody>
